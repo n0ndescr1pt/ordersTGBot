@@ -5,11 +5,14 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram import Bot, Dispatcher
 
 from data.config import TOKEN
+from handlers.admin_handlers.main_admin_handlers import register_main_admin_handlers
+from handlers.admin_handlers.settings_handlers import register_settings_admin_handlers
 from handlers.user_handlers.about_us_handlers import register_aboutUs_user_handlers
 from handlers.user_handlers.bonus_prog_handlers import register_bonus_user_handlers
 from handlers.user_handlers.galery_handlers import register_galery_user_handlers
 from handlers.user_handlers.main_handlers import register_main_user_handlers
 from handlers.user_handlers.services_handlers import register_services_user_handlers
+from utils.commands import set_commands
 
 
 def register_handler(dp: Dispatcher) -> None:
@@ -18,9 +21,13 @@ def register_handler(dp: Dispatcher) -> None:
     register_galery_user_handlers(dp)
     register_services_user_handlers(dp)
     register_aboutUs_user_handlers(dp)
-    #register_payment_handlers(dp)
-    #register_admin_handlers(dp)
-    pass
+
+    register_main_admin_handlers(dp)
+    register_settings_admin_handlers(dp)
+
+
+async def start_bot(bot: Bot):
+    await set_commands(bot) #устанвливаем команды
 
 async def main():
 
@@ -30,6 +37,8 @@ async def main():
     dp = Dispatcher(storage=storage)
 
     register_handler(dp)
+
+    dp.startup.register(start_bot) #регистрируем команды
 
     await dp.start_polling(bot)
 

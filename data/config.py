@@ -2,3 +2,4 @@
 
 TOKEN = "5514299404:AAEy8qBm4CWzGkWgLPx06BsWTX52Ol3fW4Y"
 Admin = [713246526]
+password = "123"

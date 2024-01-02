@@ -44,3 +44,17 @@ def cancel_kb():
     )
     return backKeyboard
 
+def edit_galery_kb():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="Маркетплейсы", callback_data="edit_Маркетплейсы"),
+    builder.button(text="Подарки", callback_data="edit_Подарки")
+
+    builder.button(text="Индивидуальная упаковка", callback_data="edit_Индивидуальная упаковка"),
+    builder.button(text="Фулфилмент", callback_data="edit_Фулфилмент")
+
+    builder.button(text="Назад", callback_data="Назад_admin")
+
+    builder.adjust(2)
+
+    return builder.as_markup(resize_keyboard=True)

@@ -11,20 +11,7 @@ from states import CheckAdmin
 
 
 async def start(message: types.Message, state:FSMContext):
-    await message.answer(f"Введите пароль для доступа к админ панели", reply_markup=cancel_kb())
-    await state.set_state(CheckAdmin.password)
-
-
-
-async def checkAdmin(message: types.Message, state:FSMContext):
-    if(message.text == "Отмена"):
-        await state.clear()
-        await message.answer(f"Главная", reply_markup=main_kb())
-    else:
-        if(message.text != password):
-            await message.answer(f"Неверный пароль")
-        else:
-            await message.answer(f"Главная (админка)", reply_markup=main_admin_kb())
+    pass
 
 
 
@@ -32,6 +19,5 @@ async def checkAdmin(message: types.Message, state:FSMContext):
 
 
 
-def register_main_admin_handlers(dp: Dispatcher):
+def register_upload_stat_admin_handlers(dp: Dispatcher):
     dp.message.register(start, Command(commands=['admin']))
-    dp.message.register(checkAdmin, CheckAdmin.password)

@@ -9,6 +9,7 @@ async def start(message: types.Message):
     await message.answer(f"Главная", reply_markup=main_kb())
 
 
+
 async def galery(callback: types.CallbackQuery):
     await callback.message.edit_text(f"Галерея", reply_markup=galery_kb())
 

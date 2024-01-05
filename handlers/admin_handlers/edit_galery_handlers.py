@@ -1,13 +1,6 @@
-import time
-
 from aiogram import types, Dispatcher, F
-from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 
-from data.config import password
-from keyboards.admin_kb import main_admin_kb, cancel_kb, settings_kb, edit_galery_kb
-from keyboards.user_kb import main_kb
-from states import CheckAdmin
+from keyboards.admin_kb import edit_galery_kb
 
 
 async def edit_galery(callback: types.CallbackQuery):

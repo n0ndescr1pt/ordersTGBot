@@ -19,16 +19,16 @@ def main_kb():
 def bonus_kb():
     builder = InlineKeyboardBuilder()
 
-    builder.button(text="Баланс", callback_data="Баланс"),
-    builder.button(text="Условия", callback_data="Условия")
-
-    builder.button(text="Учавствовать", callback_data="Учавствовать"),
-    builder.button(text="Услуги", callback_data="Услуги")
-
-    builder.button(text="Назад", callback_data="Назад")
-
-    builder.adjust(2)
-
+    builder.row(
+        types.InlineKeyboardButton(text="Условия", callback_data="Условия"),
+        types.InlineKeyboardButton(text="Учавствовать", callback_data="Учавствовать")
+    ),
+    builder.row(
+        types.InlineKeyboardButton(text="Услуги", callback_data="Услуги")
+    ),
+    builder.row(
+        types.InlineKeyboardButton(text="Назад", callback_data="Назад")
+    )
     return builder.as_markup(resize_keyboard=True)
 
 def galery_kb():
@@ -79,3 +79,31 @@ def services_kb():
 
 #---------main button
 
+#клавиатура для ответа про закупки
+def yesNo_kb():
+    kb = [
+        [
+            types.KeyboardButton(text="Да"),
+            types.KeyboardButton(text="Нет")
+        ],
+        [
+        types.KeyboardButton(text="Отмена")
+        ],
+    ]
+    yesNoKeyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        one_time_keyboard=True,
+        resize_keyboard=True,
+    )
+    return yesNoKeyboard
+
+#клавиатура для оформить заказ или нет после калькуляции
+def do_order_kb():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="Да", callback_data="Да"),
+    builder.button(text="Нет", callback_data="Нет")
+
+    builder.adjust(2)
+
+    return builder.as_markup(resize_keyboard=True)

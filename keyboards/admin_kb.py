@@ -20,7 +20,7 @@ def settings_kb():
     builder = InlineKeyboardBuilder()
 
     builder.button(text="Загрузить ФИД", callback_data="Загрузить ФИД"),
-    builder.button(text="Обновить прайс лист", callback_data="Обновить прайс лист")
+    builder.button(text="Обновить прайс лист", callback_data="обновитьПрайсЛист")
 
     builder.button(text="Редактировать галереи", callback_data="Редактировать галереи"),
     builder.button(text="Скачать ФИД", callback_data="Скачать ФИД")

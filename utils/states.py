@@ -1,13 +1,24 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class CheckAdmin(StatesGroup):
+class CheckAdminState(StatesGroup):
     password = State()
 
-class CryproBot(StatesGroup):
-    sum = State()
-    currency = State()
 
-class ConfigState(StatesGroup):
-    mailing = State()
-    setPrice = State()
+#состояния для калькуляции стоимости
+class PreOrderState(StatesGroup):
+    countPack = State()
+    volume = State()
+    needPurchase = State()
+    type = State()
+
+
+#состояния для отправки прайс листа админом
+class UpdatePriceListState(StatesGroup):
+    updatePriceList = State()
+
+class OrderState(StatesGroup):
+    countPack = State()
+    volume = State()
+    needPurchase = State()
+    type = State()

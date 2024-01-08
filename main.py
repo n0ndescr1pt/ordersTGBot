@@ -17,8 +17,9 @@ from handlers.user_handlers.main_handlers import register_main_user_handlers
 from handlers.user_handlers.services_handlers import register_services_user_handlers
 from utils.commands import set_commands
 
+#сделать в кнопке баланс
 
-def register_handler(dp: Dispatcher) -> None:
+async def register_handler(dp: Dispatcher):
     register_main_user_handlers(dp)
     register_bonus_user_handlers(dp)
     register_galery_user_handlers(dp)
@@ -38,11 +39,11 @@ async def start_bot(bot: Bot):
 async def main():
 
     token = TOKEN
-    bot = Bot(token,parse_mode=ParseMode.MARKDOWN_V2)
+    bot = Bot(token,parse_mode=ParseMode.HTML)
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
 
-    register_handler(dp)
+    await register_handler(dp)
 
     dp.startup.register(start_bot) #регистрируем команды
 

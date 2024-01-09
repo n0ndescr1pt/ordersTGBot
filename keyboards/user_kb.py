@@ -107,3 +107,36 @@ def do_order_kb():
     builder.adjust(2)
 
     return builder.as_markup(resize_keyboard=True)
+
+
+def getPhone_kb():
+    kb = [
+        [
+            types.KeyboardButton(text="Разрешить использовать номер телефона",request_contact=True)
+        ],
+        [
+        types.KeyboardButton(text="Отмена")
+        ],
+    ]
+    getPhoneKeyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        one_time_keyboard=True,
+        resize_keyboard=True,
+    )
+    return getPhoneKeyboard
+
+def ready_kb():
+    kb = [
+        [
+            types.KeyboardButton(text="Готово")
+        ],
+        [
+        types.KeyboardButton(text="Отмена")
+        ],
+    ]
+    readyKeyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        one_time_keyboard=True,
+        resize_keyboard=True,
+    )
+    return readyKeyboard

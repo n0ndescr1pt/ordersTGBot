@@ -1,14 +1,18 @@
+import json
+
 from aiogram import types, Dispatcher, F
-from aiogram.client import bot
+
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
-
+from aiogram import Bot
 from data.config import Admin
+from data.database.function import getBalance, insertOrder
 from keyboards.admin_kb import cancel_kb
-from keyboards.user_kb import main_kb, galery_kb, aboutUs_kb, bonus_kb, services_kb, yesNo_kb, do_order_kb
+from keyboards.user_kb import main_kb, galery_kb, aboutUs_kb, bonus_kb, services_kb, yesNo_kb, do_order_kb, getPhone_kb, \
+    ready_kb
 from utils.someMethods import cancelCalcOrder
-from utils.states import PreOrderState
+from utils.states import PreOrderState, OrderState
 
 
 async def priceList(callback: types.CallbackQuery):
@@ -27,11 +31,74 @@ async def supportAdmin(callback: types.CallbackQuery):
     await callback.message.answer(f"Услуги", reply_markup=services_kb())
 
 
-async def order(callback: types.CallbackQuery):
-    await callback.message.delete()
-    await callback.message.answer(f"Бесполезная кнопка")
-    await callback.message.answer(f"Услуги", reply_markup=services_kb())
+async def order(callback: types.CallbackQuery, state: FSMContext):
+    if (callback.message.text == "Отмена"):
+        await cancelCalcOrder(callback.message, state)
+    else:
+        await callback.message.delete()
+        await callback.message.answer(f"Для удобной связи нужен ваш телефон", reply_markup=getPhone_kb())
+        #await bot.send_photo(chat_id=callback.message.chat.id, photo=a)
+        await state.set_state(OrderState.getPhone)
 
+async def getPhone(message: types.Message, state: FSMContext):
+    await state.update_data(phone=message.contact.phone_number)
+    await state.update_data(name=message.contact.first_name)
+    balance = await getBalance(message.from_user.id)
+    await message.answer(f"У вас {balance[0]} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
+    await state.set_state(OrderState.setBonus)
+
+async def setBonus(message: types.Message, state: FSMContext):
+    if (message.text == "Отмена"):
+        await cancelCalcOrder(message, state)
+    else:
+        if(message.text == "Да"):
+            await message.answer(f"Введите сумму")
+            await state.set_state(OrderState.countBonus)
+        elif(message.text == "Нет"):
+            await state.update_data(setBonus=0)
+            await message.answer(f"Прикрепите файлы (ТЗ, пожелания)",reply_markup=ready_kb())
+            await state.set_state(OrderState.addFile)
+        else:
+            await message.answer(f"Ответье да или нет")
+
+async def countBonus(message: types.Message, state: FSMContext):
+    if (message.text == "Отмена"):
+        await cancelCalcOrder(message, state)
+    else:
+        try:
+            user_balance = await getBalance(message.from_user.id)
+            if (float(message.text) > user_balance[0]):
+                await message.answer(f"Введите сумму соответствующее вашему балансу")
+            else:
+                await state.update_data(setBonus=int(message.text))
+                await message.answer(f"Прикрепите файлы (ТЗ, пожелания)",reply_markup=ready_kb())
+                await state.set_state(OrderState.addFile)
+        except ValueError:
+            await message.answer(f"Вводите число")
+
+
+docsId = []
+async def addFile(message: types.Message, state: FSMContext):
+    if(message.text=="Отмена"):
+        await cancelCalcOrder(message, state)
+        docsId.clear()
+
+    elif(message.text=="Готово"):
+        data = await state.get_data()
+        bonusBalance = data['setBonus']
+        user_id = message.from_user.id
+        name = data['name']
+        phone = data['phone']
+        dumpsDocsId = json.dumps(docsId)
+        await insertOrder(user_id,bonusBalance, name, phone, dumpsDocsId)
+        docsId.clear()
+        await state.clear()
+        await message.answer(f"В ближайшее время с вами свяжется специалист")
+        await message.answer(f"Услуги", reply_markup=services_kb())
+    else:
+        docsId.append(message.document.file_id)
+        print(docsId)
+        await message.answer(f"Можете отправить еще один файл",reply_markup=ready_kb())
 
 
 
@@ -100,8 +167,11 @@ async def no(callback: types.CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(f"Услуги", reply_markup=services_kb())
 
-async def yes(callback: types.CallbackQuery):
-    pass
+async def yes(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.delete()
+    await callback.message.answer(f"Для удобной связи нужен ваш телефон", reply_markup=getPhone_kb())
+    # await bot.send_photo(chat_id=callback.message.chat.id, photo=a)
+    await state.set_state(OrderState.getPhone)
 
 #конец предварительного расчета
 
@@ -119,3 +189,8 @@ def register_services_user_handlers(dp: Dispatcher):
 
     dp.callback_query.register(no, F.data == "Нет")
     dp.callback_query.register(yes, F.data == "Да")
+
+    dp.message.register(getPhone, OrderState.getPhone)
+    dp.message.register(setBonus, OrderState.setBonus)
+    dp.message.register(countBonus, OrderState.countBonus)
+    dp.message.register(addFile, OrderState.addFile)

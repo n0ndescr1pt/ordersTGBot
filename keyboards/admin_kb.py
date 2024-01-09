@@ -8,7 +8,7 @@ def main_admin_kb():
     builder.button(text="Настройки", callback_data="Настройки"),
     builder.button(text="Добавить заказ", callback_data="Добавить заказ")
 
-    builder.button(text="Выгрузить статистику", callback_data="Выгрузить статистику"),
+    builder.button(text="Выгрузить статистику", callback_data="uploadStat"),
     builder.button(text="Сообщение пользователю", callback_data="Сообщение пользователю")
 
     builder.adjust(2)

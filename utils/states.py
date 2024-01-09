@@ -18,7 +18,7 @@ class UpdatePriceListState(StatesGroup):
     updatePriceList = State()
 
 class OrderState(StatesGroup):
-    countPack = State()
-    volume = State()
-    needPurchase = State()
-    type = State()
+    getPhone = State()
+    setBonus = State()
+    countBonus = State()
+    addFile = State()

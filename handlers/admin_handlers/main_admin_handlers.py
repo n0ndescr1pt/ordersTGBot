@@ -23,6 +23,7 @@ async def checkAdmin(message: types.Message, state:FSMContext):
             await message.answer(f"Неверный пароль")
         else:
             await message.answer(f"Главная (админка)", reply_markup=main_admin_kb())
+            await state.clear()
 
 
 async def back(callback: types.CallbackQuery):

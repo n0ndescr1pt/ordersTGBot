@@ -1,0 +1,36 @@
+{
+    "@squasar": {
+        "orders": {
+            "1": {
+                "name": "Дарья",
+                "phone": "79087980039"
+            }
+        },
+        "balance": 0.0
+    },
+    "@n0ndescr1pt": {
+        "orders": {
+            "1": {
+                "name": "nondescript",
+                "phone": "+79048208178"
+            },
+            "2": {
+                "name": "nondescript",
+                "phone": "+79048208178"
+            },
+            "3": {
+                "name": "nondescript",
+                "phone": "+79048208178"
+            },
+            "4": {
+                "name": "nondescript",
+                "phone": "+79048208178"
+            },
+            "5": {
+                "name": "nondescript",
+                "phone": "+79048208178"
+            }
+        },
+        "balance": 0.0
+    }
+}

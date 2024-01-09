@@ -18,3 +18,26 @@ async def getBalance(user_id: int):
     balance = cursor.execute("SELECT balance FROM users WHERE user_id = (?)",(user_id,)).fetchone()
     connection.close()
     return balance
+
+
+async def insertOrder(user_id: int, bonus_balance, name, phone, docs_id):
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute("INSERT INTO orders (user_id, bonus_balance, name, phone, files) VALUES (?,?,?,?,?)", (user_id, bonus_balance, name, phone, docs_id))
+    connection.commit()
+    connection.close()
+
+
+#вся статистика польщователей
+async def getStats():
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    stat = cursor.execute("SELECT * FROM users INNER JOIN orders on orders.user_id = users.user_id").fetchall()
+    connection.close()
+    return stat
+
+async def getUsers():
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    users = cursor.execute("SELECT user_id, name, balance FROM users ").fetchall()
+    connection.close()
+    return users

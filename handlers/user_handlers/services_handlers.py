@@ -97,7 +97,7 @@ async def addFile(message: types.Message, state: FSMContext):
         await message.answer(f"Услуги", reply_markup=services_kb())
     else:
         docsId.append(message.document.file_id)
-        print(docsId)
+        #print(docsId)
         await message.answer(f"Можете отправить еще один файл",reply_markup=ready_kb())
 
 

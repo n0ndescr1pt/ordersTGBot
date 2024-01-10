@@ -17,8 +17,27 @@ class PreOrderState(StatesGroup):
 class UpdatePriceListState(StatesGroup):
     updatePriceList = State()
 
+
+#состояния для создания заказа
 class OrderState(StatesGroup):
     getPhone = State()
     setBonus = State()
     countBonus = State()
     addFile = State()
+
+
+
+#galery
+
+
+class Galery(StatesGroup):
+    choose = State()
+    getGaleryPhoto = State()
+    getGaleryCaption = State()
+
+class EditMarketplace(StatesGroup):
+    getPhoto = State()
+    setCaption = State()
+
+
+

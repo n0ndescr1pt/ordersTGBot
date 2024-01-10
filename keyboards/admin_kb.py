@@ -58,3 +58,38 @@ def edit_galery_kb():
     builder.adjust(2)
 
     return builder.as_markup(resize_keyboard=True)
+
+
+def edit_kb():
+    kb = [
+        [
+            types.KeyboardButton(text="Добавить"),
+            types.KeyboardButton(text="Изменить"),
+            types.KeyboardButton(text="Удалить"),
+        ],
+        [types.KeyboardButton(text="Отмена"),],
+
+    ]
+    backKeyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        one_time_keyboard=True,
+        resize_keyboard=True,
+    )
+    return backKeyboard
+
+def add_photo_kb():
+    kb = [
+        [
+            types.KeyboardButton(text="Готово"),
+        ],
+        [
+            types.KeyboardButton(text="Отмена")
+        ],
+
+    ]
+    backKeyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        one_time_keyboard=True,
+        resize_keyboard=True,
+    )
+    return backKeyboard

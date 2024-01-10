@@ -41,3 +41,9 @@ async def getUsers():
     users = cursor.execute("SELECT user_id, name, balance FROM users ").fetchall()
     connection.close()
     return users
+
+async def addGalery(galery_id, images, caption):
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute("INSERT INTO galery (galery_id, images, caption) VALUES (?,?,?)",   (galery_id, images, caption))
+    connection.commit()
+    connection.close()

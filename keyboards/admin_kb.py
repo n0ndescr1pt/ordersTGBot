@@ -1,6 +1,9 @@
 from aiogram import types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
+from data.database.function import selectGalery
+from utils.callbackFactory import NumbersCallbackFactoryEdit, NumbersCallbackFactoryDelete
+
 
 def main_admin_kb():
     builder = InlineKeyboardBuilder()
@@ -65,7 +68,7 @@ def edit_kb():
         [
             types.KeyboardButton(text="Добавить"),
             types.KeyboardButton(text="Изменить"),
-            types.KeyboardButton(text="Удалить"),
+            types.KeyboardButton(text="Удалить")
         ],
         [types.KeyboardButton(text="Отмена"),],
 
@@ -93,3 +96,28 @@ def add_photo_kb():
         resize_keyboard=True,
     )
     return backKeyboard
+
+
+async def edit_galery_items_kb(galeryID):
+    builder = InlineKeyboardBuilder()
+    i=0
+    galeryItems = await selectGalery(galeryID)
+    for item in galeryItems:
+        i+=1
+        builder.button(text=f"{i}", callback_data=NumbersCallbackFactoryEdit(id=item[0])),
+
+    builder.adjust(1)
+
+    return builder.as_markup()
+
+async def delete_galery_items_kb(galeryID):
+    builder = InlineKeyboardBuilder()
+    i=0
+    galeryItems = await selectGalery(galeryID)
+    for item in galeryItems:
+        i+=1
+        builder.button(text=f"{i}", callback_data=NumbersCallbackFactoryDelete(id=item[0])),
+
+    builder.adjust(1)
+
+    return builder.as_markup()

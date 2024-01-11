@@ -47,3 +47,20 @@ async def addGalery(galery_id, images, caption):
     connection.execute("INSERT INTO galery (galery_id, images, caption) VALUES (?,?,?)",   (galery_id, images, caption))
     connection.commit()
     connection.close()
+
+
+#выборка обьектов галереи для создания клавиатуры
+async def selectGalery(galery_id):
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    stat = cursor.execute("SELECT * FROM galery where galery_id = ?",(galery_id,)).fetchall()
+    connection.close()
+    return stat
+
+#удаление нужного объекта
+async def deleteGalery(galery_id: int):
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM galery WHERE id = (?)",(galery_id,))
+    connection.commit()
+    connection.close()

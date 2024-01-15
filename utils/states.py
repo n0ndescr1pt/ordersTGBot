@@ -40,4 +40,12 @@ class EditMarketplace(StatesGroup):
     setCaption = State()
 
 
+class ConfirmOrderState(StatesGroup):
+    setSumm = State()
+
+class ConfirmOrderByIDState(StatesGroup):
+    getOrderID = State()
+    confirmOrder = State()
+    setSumm = State()
+
 

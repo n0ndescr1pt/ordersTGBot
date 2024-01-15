@@ -5,7 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram import Bot, Dispatcher
 
 from data.config import TOKEN
-from handlers.admin_handlers.add_rder_handlers import register_add_order_admin_handlers
+from handlers.admin_handlers.add_order_handlers import register_add_order_admin_handlers
 from handlers.admin_handlers.edit_galery_handlers import register_edit_galery_admin_handlers
 from handlers.admin_handlers.main_admin_handlers import register_main_admin_handlers
 from handlers.admin_handlers.settings_handlers import register_settings_admin_handlers

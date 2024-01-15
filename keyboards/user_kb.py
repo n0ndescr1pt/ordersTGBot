@@ -140,3 +140,25 @@ def ready_kb():
         resize_keyboard=True,
     )
     return readyKeyboard
+
+def confirmOrder_kb():
+    kb = [
+        [
+            types.KeyboardButton(text="Подтвердить")
+        ],
+        [
+            types.KeyboardButton(text="Отметить как оплачено")
+        ],
+        [
+        types.KeyboardButton(text="Удалить")
+        ],
+        [
+            types.KeyboardButton(text="Отменить")
+        ],
+    ]
+    readyKeyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        one_time_keyboard=True,
+        resize_keyboard=True,
+    )
+    return readyKeyboard

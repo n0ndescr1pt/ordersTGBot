@@ -51,13 +51,13 @@ async def choose_edit_delete_galery(message: types.Message, state: FSMContext):
 
         elif(message.text == "Изменить"):
             data = await state.get_data()
-            await getGaleryItems(message, data['galery_id'])
+            await getGaleryItems(message, data['galery_id'],data['galery_id'])
 
             await message.answer(f"Выберите элемент который нужно изменить",reply_markup=await edit_galery_items_kb(data['galery_id']))
 
         elif (message.text == "Удалить"):
             data = await state.get_data()
-            await getGaleryItems(message, data['galery_id'])
+            await getGaleryItems(message, data['galery_id'],data['galery_id'])
 
             await message.answer(f"Выберите элемент который нужно изменить",reply_markup=await delete_galery_items_kb(data['galery_id']))
 
@@ -96,7 +96,7 @@ async def get_galery_photo(message: types.Message, state: FSMContext):
         await state.set_state(Galery.getGaleryCaption)
     else:
         photos = message.photo
-        imgs.append(photos[-1].file_id)
+        imgs.append(photos[0].file_id)
 
 async def get_galery_caption(message: types.Message, state: FSMContext):
     if (message.text == "Отмена"):
@@ -110,9 +110,12 @@ async def get_galery_caption(message: types.Message, state: FSMContext):
         await state.clear()
 
 
+#документы
+#сумма
+#сумма без скидки
+#сообщение пользователю
 
-
-
+#поддтверждение второй раз что оплачено
 def register_edit_galery_admin_handlers(dp: Dispatcher):
     dp.callback_query.register(main_edit_galery, F.data == "Редактировать галереи")
 

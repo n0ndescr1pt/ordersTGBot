@@ -7,22 +7,22 @@ from utils.someMethods import getGaleryItems
 
 async def marketplaces(callback: types.CallbackQuery):
     await callback.message.delete()
-    await getGaleryItems(callback.message, "marketplace")
+    await getGaleryItems(callback.message, "marketplace","Маркетплейс")
     await callback.message.answer(f"Галерея", reply_markup=galery_kb())
 
 async def presents(callback: types.CallbackQuery):
     await callback.message.delete()
-    await getGaleryItems(callback.message, "present")
+    await getGaleryItems(callback.message, "present","Подарки")
     await callback.message.answer(f"Галерея", reply_markup=galery_kb())
 
 async def individualYpakovka(callback: types.CallbackQuery):
     await callback.message.delete()
-    await getGaleryItems(callback.message, "individualPack")
+    await getGaleryItems(callback.message, "individualPack","Индивидиульная упаковка")
     await callback.message.answer(f"Галерея", reply_markup=galery_kb())
 
 async def fullfillment(callback: types.CallbackQuery):
     await callback.message.delete()
-    await getGaleryItems(callback.message,"fullfillment")
+    await getGaleryItems(callback.message,"fullfillment","Фуллфиллмент")
     await callback.message.answer(f"Галерея", reply_markup=galery_kb())
 
 

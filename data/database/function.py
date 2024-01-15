@@ -20,11 +20,19 @@ async def getBalance(user_id: int):
     return balance
 
 
-async def insertOrder(user_id: int, bonus_balance, name, phone, docs_id):
+async def insertOrder(user_id: int, bonus_balance, name, phone, docs_id,status):
     connection = sqlite3.connect('data/database/database.db')
-    connection.execute("INSERT INTO orders (user_id, bonus_balance, name, phone, files) VALUES (?,?,?,?,?)", (user_id, bonus_balance, name, phone, docs_id))
+    orderID = connection.execute("INSERT INTO orders (user_id, bonus_decrease, name, phone, files, status) VALUES (?,?,?,?,?,?)", (user_id, bonus_balance, name, phone, docs_id, status)).lastrowid
     connection.commit()
     connection.close()
+    return orderID
+
+async def insertOrderWithCalc(user_id: int, bonus_balance, name, phone, docs_id, count_packs, volume,needPurchase, ratio, calc_summ, status):
+    connection = sqlite3.connect('data/database/database.db')
+    orderID = connection.execute("INSERT INTO orders (user_id, bonus_decrease, name, phone, files, count_packs, volume,needPurchase, ratio, calc_summ, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",(user_id, bonus_balance, name, phone, docs_id,count_packs, volume,needPurchase, ratio, calc_summ, status)).lastrowid
+    connection.commit()
+    connection.close()
+    return orderID
 
 
 #вся статистика польщователей
@@ -64,3 +72,55 @@ async def deleteGalery(galery_id: int):
     cursor.execute("DELETE FROM galery WHERE id = (?)",(galery_id,))
     connection.commit()
     connection.close()
+
+
+#достаем нужный заказ для последующего подтверждения его админом
+async def selectOrder(order_id: int):
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    stat = cursor.execute("SELECT order_id FROM orders where order_id = ?", (order_id,)).fetchall()
+    connection.close()
+    return stat
+
+async def confirmOrderStatus(order_id: int, summ: float, status):
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute(f"UPDATE orders set status = (?) WHERE order_id = (?) ",(status, order_id))
+    connection.execute(f"UPDATE orders set real_summ = (?) WHERE order_id = (?) ", (summ, order_id))
+
+    cursor = connection.cursor()
+    summ_with_bonus = cursor.execute("SELECT bonus_decrease, real_summ, user_id FROM orders WHERE order_id = (?)", (order_id,)).fetchone()
+    if(summ_with_bonus[0]>summ_with_bonus[1]):
+        connection.execute(f"UPDATE orders set summ_with_bonus = 0 where order_id = (?) ",(order_id,))
+        connection.execute(f"UPDATE users set balance = {summ_with_bonus[0]-summ_with_bonus[1]}+(select balance from users where user_id = {summ_with_bonus[2]}) WHERE user_id = {summ_with_bonus[2]} ")
+    else:
+        connection.execute(f"UPDATE orders set summ_with_bonus = {summ_with_bonus[1] - summ_with_bonus[0]} where order_id = (?) ", (order_id,))
+    connection.commit()
+    connection.close()
+
+async def confirmOrderPaid(order_id: int, status):
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute(f"UPDATE orders set status = (?) WHERE order_id = (?) ",(status, order_id))
+
+    cursor = connection.cursor()
+    user_id = cursor.execute("SELECT user_id FROM orders WHERE order_id = (?)",
+                                     (order_id,)).fetchone()
+    connection.execute(f"UPDATE users set balance = (select real_summ*0.05+(select balance from users where user_id = {user_id[0]}) from orders WHERE order_id = (?)) WHERE user_id = {user_id[0]} ", (order_id,))
+    connection.execute(f"UPDATE users set balance = (select balance-(select bonus_decrease from orders where order_id = (?)) from users where user_id = {user_id[0]}) WHERE user_id = {user_id[0]} ",(order_id,))
+    cursor = connection.cursor()
+    user_id = cursor.execute("SELECT user_id FROM orders WHERE order_id = (?)", (order_id,)).fetchone()
+    connection.commit()
+    connection.close()
+    return user_id
+
+async def deleteOrderFromDB(order_id: int):
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute("DELETE FROM orders WHERE order_id=?", (order_id,))
+    connection.commit()
+    connection.close()
+
+async def getOrderStatus(order_id: int):
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    stat = cursor.execute("SELECT status FROM orders where order_id = ?", (order_id,)).fetchone()
+    connection.close()
+    return stat

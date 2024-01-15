@@ -1,15 +1,16 @@
 from aiogram import types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
-from data.database.function import selectGalery
-from utils.callbackFactory import NumbersCallbackFactoryEdit, NumbersCallbackFactoryDelete
+from data.database.function import selectGalery, selectOrder
+from utils.callbackFactory import NumbersCallbackFactoryEdit, NumbersCallbackFactoryDelete, \
+    NumbersCallbackFactoryConfirmOrder, NumbersCallbackFactorySetOrderUsPaid, NumbersCallbackFactoryDeleteOrder
 
 
 def main_admin_kb():
     builder = InlineKeyboardBuilder()
 
     builder.button(text="Настройки", callback_data="Настройки"),
-    builder.button(text="Добавить заказ", callback_data="Добавить заказ")
+    builder.button(text="Добавить заказ", callback_data="confirmOrder")
 
     builder.button(text="Выгрузить статистику", callback_data="uploadStat"),
     builder.button(text="Сообщение пользователю", callback_data="Сообщение пользователю")
@@ -121,3 +122,22 @@ async def delete_galery_items_kb(galeryID):
     builder.adjust(1)
 
     return builder.as_markup()
+
+
+async def confirm_order_kb(orderdID):
+    builder = InlineKeyboardBuilder()
+    builder.button(text=f"Подтвердить", callback_data=NumbersCallbackFactoryConfirmOrder(id=orderdID)),
+    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID)),
+    builder.adjust(1)
+
+    return builder.as_markup()
+
+async def setOrderAsPaid_kb(orderdID):
+    builder = InlineKeyboardBuilder()
+    builder.button(text=f"Отметить как оплаченный", callback_data=NumbersCallbackFactorySetOrderUsPaid(id=orderdID)),
+    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID)),
+    builder.adjust(1)
+
+    return builder.as_markup()
+
+

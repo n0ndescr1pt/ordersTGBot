@@ -23,11 +23,11 @@ def main_admin_kb():
 def settings_kb():
     builder = InlineKeyboardBuilder()
 
-    builder.button(text="Загрузить ФИД", callback_data="Загрузить ФИД"),
+    builder.button(text="Загрузить ФИД", callback_data="uploadFeed"),
     builder.button(text="Обновить прайс лист", callback_data="обновитьПрайсЛист")
 
     builder.button(text="Редактировать галереи", callback_data="Редактировать галереи"),
-    builder.button(text="Скачать ФИД", callback_data="Скачать ФИД")
+    builder.button(text="Скачать ФИД", callback_data="downloadFeed")
 
     builder.button(text="Назад", callback_data="Назад_admin")
 

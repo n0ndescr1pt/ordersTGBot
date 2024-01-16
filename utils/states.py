@@ -48,4 +48,5 @@ class ConfirmOrderByIDState(StatesGroup):
     confirmOrder = State()
     setSumm = State()
 
-
+class UpdateFeedState(StatesGroup):
+    updateFeed = State()

@@ -1,8 +1,7 @@
-from aiogram import types, Dispatcher, F
-from aiogram.filters import CommandStart
+import json
 
-from data.database.function import getBalance
-from keyboards.user_kb import main_kb, galery_kb, aboutUs_kb, bonus_kb, services_kb
+from aiogram import types, Dispatcher, F
+from keyboards.user_kb import bonus_kb
 
 
 
@@ -10,7 +9,9 @@ from keyboards.user_kb import main_kb, galery_kb, aboutUs_kb, bonus_kb, services
 
 async def conditions(callback: types.CallbackQuery):
     await callback.message.delete()
-    await callback.message.answer(f"Очень важные условия\n1. Спам - бан\n2. Скам - бан")
+    with open("data/feed.json", "r", encoding='utf-8') as f:
+        data = json.load(f)
+    await callback.message.answer(f"{data['bonus_prog']['condition']}")
     await callback.message.answer(f"Бонусная программа", reply_markup=bonus_kb())
 
 async def participate(callback: types.CallbackQuery):

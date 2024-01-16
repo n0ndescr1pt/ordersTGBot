@@ -1,40 +1,35 @@
 {
     "@squasar": {
-        "orders": {
-            "1": {
-                "name": "Дарья",
-                "phone": "79087980039"
-            }
-        },
-        "balance": 0.0
+        "orders": {},
+        "balance": 1000.0
     },
     "@n0ndescr1pt": {
         "orders": {
             "1": {
                 "name": "nondescript",
-                "phone": "+79048208178"
+                "phone": "+79048208178",
+                "bonus_decreased": 10,
+                "bonus_added": 5.0,
+                "summ": 100.0,
+                "summ_with_bonus": 90.0
             },
             "2": {
                 "name": "nondescript",
-                "phone": "+79048208178"
+                "phone": "+79048208178",
+                "bonus_decreased": 0,
+                "bonus_added": 500.0,
+                "summ": 10000.0,
+                "summ_with_bonus": 10000.0
             },
             "3": {
                 "name": "nondescript",
-                "phone": "+79048208178"
-            },
-            "4": {
-                "name": "nondescript",
-                "phone": "+79048208178"
-            },
-            "5": {
-                "name": "nondescript",
-                "phone": "+79048208178"
-            },
-            "6": {
-                "name": "nondescript",
-                "phone": "+79048208178"
+                "phone": "+79048208178",
+                "bonus_decreased": 100,
+                "bonus_added": 50.0,
+                "summ": 1000.0,
+                "summ_with_bonus": 900.0
             }
         },
-        "balance": 0.0
+        "balance": 450.0
     }
 }

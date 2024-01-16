@@ -14,14 +14,21 @@ async def uploadStat(callback: types.CallbackQuery):
     stat = await getStats()
     users = await getUsers()
     n_data = {}
-    
+    print(stat)
     for user in users:
         n_data[user[1]] = {"orders":{}}
         i = 0
         for order in stat:
             if(order[4] == user[0]):
                 i+=1
-                n_data[user[1]]["orders"][i] = {"name":order[6],"phone":order[7]}
+                n_data[user[1]]["orders"][i] = {"name":order[6],
+                                                "phone":order[7],
+                                                "bonus_decreased": order[5],
+                                                "bonus_added": int(order[15])*0.05,
+                                                "summ": order[15],
+                                                "summ_with_bonus": order[16],
+                                                "status": order[14]
+                                                }
 
         n_data[user[1]]["balance"] = user[2]
 

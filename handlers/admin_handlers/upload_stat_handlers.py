@@ -14,7 +14,6 @@ async def uploadStat(callback: types.CallbackQuery):
     stat = await getStats()
     users = await getUsers()
     n_data = {}
-    print(stat)
     for user in users:
         n_data[user[1]] = {"orders":{}}
         i = 0

@@ -16,7 +16,7 @@ from keyboards.user_kb import services_kb, yesNo_kb, do_order_kb, getPhone_kb, \
     ready_kb
 from utils.callbackFactory import NumbersCallbackFactoryConfirmOrder, NumbersCallbackFactorySetOrderUsPaid, \
     NumbersCallbackFactoryDeleteOrder
-from utils.someMethods import cancelCalcOrder
+from utils.someMethods import cancelCalcOrder, cancelConfirmOrder
 from utils.states import PreOrderState, OrderState, ConfirmOrderState
 
 
@@ -52,7 +52,7 @@ async def getPhone(message: types.Message, state: FSMContext):
         await state.update_data(phone=message.contact.phone_number)
         await state.update_data(name=message.contact.first_name)
         balance = await getBalance(message.from_user.id)
-        await message.answer(f"У вас {balance[0]} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
+        await message.answer(f"У вас {round(balance[0],2)} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
         await state.set_state(OrderState.setBonus)
 
 async def setBonus(message: types.Message, state: FSMContext):
@@ -179,27 +179,39 @@ async def confirmOrder(callback: types.CallbackQuery, state: FSMContext, callbac
 
 async def confirmOrderSumm(message: types.Message, state: FSMContext):
     if (message.text == "Отмена"):
-        await cancelCalcOrder(message, state)
+        await cancelConfirmOrder(message, state)
     else:
-        try:
-            await state.update_data(orderSumm=message.text)
-            data = await state.get_data()
-            order_id = data['orderID']
-            orderSumm = data['orderSumm']
-            status = "confirm"
-            await confirmOrderStatus(order_id=int(order_id),summ=float(orderSumm), status=status)
-            await message.answer(f"Заказ {order_id} успешно подтвержден")
-            await state.clear()
-        except ValueError:
-            data = await state.get_data()
-            order_id = data['orderID']
-            await message.answer(f"Введите сумму для заказа {order_id}")
+        data = await state.get_data()
+        order_id = data['orderID']
+        order_status = await getOrderStatus(order_id)
+        if(order_status[0]=="confirm"):
+            await message.answer(f"Заказ {order_id} уже подтвежден")
+        elif (order_status[0] == "paid"):
+            await message.answer(f"Заказ {order_id} уже оплачен")
+        else:
+            try:
+                await state.update_data(orderSumm=message.text)
+                data = await state.get_data()
+                order_id = data['orderID']
+                orderSumm = data['orderSumm']
+                status = "confirm"
+                await confirmOrderStatus(order_id=int(order_id),summ=float(orderSumm), status=status)
+                await message.answer(f"Заказ {order_id} успешно подтвержден")
+                await state.clear()
+            except ValueError:
+                data = await state.get_data()
+                order_id = data['orderID']
+                await message.answer(f"Введите сумму для заказа {order_id}")
 
 async def SetOrderUsPaid(callback: types.CallbackQuery, callback_data: NumbersCallbackFactorySetOrderUsPaid):
-    user_id = await confirmOrderPaid(callback_data.id, "paid")
-    await callback.message.answer(f"Заказ {callback_data.id} отмечен как оплачен")
-    await callback.bot.send_message(chat_id=user_id[0],text=f"Оплата заказа подтверждена, заказ находится в обработке")
-    await callback.message.delete()
+    order_status = await getOrderStatus(callback_data.id)
+    if (order_status[0] == "paid"):
+        await callback.message.answer(f"Заказ {callback_data.id} уже подтвежден")
+    else:
+        user_id = await confirmOrderPaid(callback_data.id, "paid")
+        await callback.message.answer(f"Заказ {callback_data.id} отмечен как оплачен")
+        await callback.bot.send_message(chat_id=user_id[0],text=f"Оплата заказа подтверждена, заказ находится в обработке")
+        await callback.message.delete()
 
 async def deleteOrder(callback: types.CallbackQuery, callback_data: NumbersCallbackFactoryDeleteOrder):
     await deleteOrderFromDB(callback_data.id)

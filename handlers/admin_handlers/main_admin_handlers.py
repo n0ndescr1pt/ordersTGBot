@@ -24,23 +24,32 @@ async def checkAdmin(message: types.Message, state: FSMContext):
         await state.clear()
         await message.answer(f"Главная", reply_markup=main_kb())
     else:
-        if (ab.tryes == 1):
-            ab.tryes -= 1
-            ab.last_try = datetime.datetime.now()
-
-        elif (datetime.datetime.now() > ab.last_try + datetime.timedelta(minutes=1)):
-            ab.tryes = 5
-
-        elif (ab.tryes > 0 and message.text == password):
+        if(message.text == password):
             await message.answer(f"Главная (админка)", reply_markup=main_admin_kb())
             await state.clear()
         else:
-            if(ab.tryes<0):
-                ab.tryes -= 1
-                await message.answer(f"Подождите пять минут")
+            ab.tryes-=1
+            await message.answer(f"Неверный пароль")
+            if (ab.tryes<1):
+                ab.last_try = datetime.datetime.now()
+                await state.set_state(CheckAdminState.wrongPassword)
+
+async def wrongPass(message: types.Message, state: FSMContext):
+    if (message.text == "Отмена"):
+        await state.clear()
+        await message.answer(f"Главная", reply_markup=main_kb())
+    else:
+        if (datetime.datetime.now() > ab.last_try + datetime.timedelta(minutes=1)):
+            if (message.text == password):
+                await message.answer(f"Главная (админка)", reply_markup=main_admin_kb())
+                await state.clear()
             else:
-                ab.tryes -= 1
-                await message.answer(f"Неверный пароль")
+                ab.tryes = 5
+                await message.answer(f"Неверный пароль", reply_markup=cancel_kb())
+                await state.set_state(CheckAdminState.password)
+        else:
+            await message.answer(f"Подождите перед следующей попыткой")
+
 
 
 
@@ -49,7 +58,11 @@ async def back(callback: types.CallbackQuery):
     await callback.message.edit_text(f"Главная (админка)", reply_markup=main_admin_kb())
 
 
+
+
+
 def register_main_admin_handlers(dp: Dispatcher):
     dp.message.register(start, Command(commands=['admin']))
     dp.message.register(checkAdmin, CheckAdminState.password)
     dp.callback_query.register(back, F.data == "Назад_admin")
+    dp.message.register(wrongPass,CheckAdminState.wrongPassword)

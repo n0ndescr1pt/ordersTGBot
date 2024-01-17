@@ -3,6 +3,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 class CheckAdminState(StatesGroup):
     password = State()
+    wrongPassword = State()
 
 
 #состояния для калькуляции стоимости

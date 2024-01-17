@@ -5,9 +5,8 @@ def addUser(user_id: int, name):
     connection = sqlite3.connect('data/database/database.db')
     cursor = connection.cursor()
     info = cursor.execute("SELECT user_id FROM users WHERE user_id = (?)", (user_id,)).fetchone()
-    if(info != None):
-        connection.execute("DELETE FROM users WHERE user_id=?", (user_id,))
-    connection.execute("INSERT INTO users (user_id,name,balance) VALUES (?, ?, ?)", (user_id,f"@{name}",0))
+    if(info == None):
+        connection.execute("INSERT INTO users (user_id,name,balance) VALUES (?, ?, ?)", (user_id,f"@{name}",0))
     connection.commit()
     connection.close()
 
@@ -124,3 +123,4 @@ async def getOrderStatus(order_id: int):
     stat = cursor.execute("SELECT status FROM orders where order_id = ?", (order_id,)).fetchone()
     connection.close()
     return stat
+

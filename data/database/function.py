@@ -124,3 +124,31 @@ async def getOrderStatus(order_id: int):
     connection.close()
     return stat
 
+async def getUserPhoneAndName(user_id: int):
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    stat = cursor.execute("SELECT phone,first_name FROM users where user_id = ?", (user_id,)).fetchone()
+    connection.close()
+    return stat
+async def setUserPhoneAndName(user_id: int, phone, first_name):
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute("update users set phone = ? where user_id = ?", (phone,user_id))
+    connection.execute("update users set first_name = ? where user_id = ?", (first_name, user_id))
+    connection.commit()
+    connection.close()
+
+async def getUserIDfromNickname(nickname):
+    connection = sqlite3.connect('data/database/database.db')
+    cursor = connection.cursor()
+    stat = cursor.execute("SELECT user_id FROM users where name = ?", (nickname,)).fetchone()
+    connection.close()
+    return stat
+
+async def updateGalery(galery_id, images, caption):
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute("insert into galery (galery_id,images, caption) VALUES (?,?,?)", (galery_id,images,caption))
+    connection.commit()
+    connection.close()
+
+
+

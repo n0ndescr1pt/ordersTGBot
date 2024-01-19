@@ -17,7 +17,11 @@ from handlers.user_handlers.main_handlers import register_main_user_handlers
 from handlers.user_handlers.services_handlers import register_services_user_handlers
 from utils.commands import set_commands
 
-#сделать в кнопке баланс
+#коэффицент на выбор
+#сохранять номер после первого запроса
+#соо пользователю через выбор ника
+
+#в фид галереи
 
 async def register_handler(dp: Dispatcher):
     register_main_user_handlers(dp)

@@ -1,9 +1,10 @@
+import json
+
 from aiogram import types, Dispatcher, F
-from aiogram.client import bot
-from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 
+from data.database.function import updateGalery
 from keyboards.admin_kb import settings_kb
 from utils.someMethods import cancelUpdatePriceList
 from utils.states import UpdatePriceListState, UpdateFeedState
@@ -48,6 +49,18 @@ async def uploadFeed(message: types.Message, state:FSMContext):
     else:
         document = message.document
         await message.bot.download(file=document, destination="data/feed.json")
+
+        with open("data/feed.json", "r", encoding='utf-8') as f:
+            data = json.load(f)
+            for galery_item in data['galery']:
+                for item in data['galery'][galery_item]:
+                    caption = data['galery'][galery_item][item]['caption']
+                    imgs = []
+                    for img in data['galery'][galery_item][item]['imgs']:
+                        mes = await message.answer_photo(photo=data['galery'][galery_item][item]['imgs'][img])
+                        imgs.append(mes.photo[0].file_id)
+                        await message.bot.delete_message(chat_id=message.chat.id, message_id=mes.message_id)
+                    await updateGalery(galery_id=galery_item, images=json.dumps(imgs), caption=caption)
 
         await message.answer(f"ФИД успешно обновлен")
         await message.answer(f"Настройки", reply_markup=settings_kb())

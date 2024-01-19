@@ -1,10 +1,8 @@
 import json
 
 from aiogram import types, Dispatcher, F
-from aiogram.filters import CommandStart
 
-
-from keyboards.user_kb import main_kb, galery_kb, aboutUs_kb, bonus_kb, services_kb
+from keyboards.user_kb import aboutUs_kb
 
 
 

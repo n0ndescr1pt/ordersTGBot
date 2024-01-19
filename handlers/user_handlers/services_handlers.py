@@ -10,12 +10,12 @@ from aiogram.utils.media_group import MediaGroupBuilder
 
 from data.config import Admin
 from data.database.function import getBalance, insertOrder, insertOrderWithCalc, confirmOrderStatus, confirmOrderPaid, \
-    deleteOrderFromDB, getOrderStatus
+    deleteOrderFromDB, getOrderStatus, getUserPhoneAndName, setUserPhoneAndName
 from keyboards.admin_kb import cancel_kb, confirm_order_kb, setOrderAsPaid_kb
 from keyboards.user_kb import services_kb, yesNo_kb, do_order_kb, getPhone_kb, \
-    ready_kb
+    ready_kb, get_coefficient_kb
 from utils.callbackFactory import NumbersCallbackFactoryConfirmOrder, NumbersCallbackFactorySetOrderUsPaid, \
-    NumbersCallbackFactoryDeleteOrder
+    NumbersCallbackFactoryDeleteOrder, CoefficientPreOrder
 from utils.someMethods import cancelCalcOrder, cancelConfirmOrder
 from utils.states import PreOrderState, OrderState, ConfirmOrderState
 
@@ -41,24 +41,42 @@ async def order(callback: types.CallbackQuery, state: FSMContext):
         await cancelCalcOrder(callback.message, state)
     else:
         await callback.message.delete()
-        await callback.message.answer(f"Для удобной связи нужен ваш телефон", reply_markup=getPhone_kb())
+        phone = await getUserPhoneAndName(callback.from_user.id)
+        docsId = []
+        await state.update_data(docs=docsId)
+        if(phone[0] == None):
+            await callback.message.answer(f"Для удобной связи нужен ваш телефон", reply_markup=getPhone_kb())
+            await state.set_state(OrderState.getPhone)
+        else:
+            await callback.message.answer(f"Телефон был сохранен")
+            balance = await getBalance(callback.from_user.id)
+            print(balance)
+            await callback.message.answer(f"У вас {round(balance[0], 2)} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
+            await state.set_state(OrderState.setBonus)
 
-        await state.set_state(OrderState.getPhone)
+
 
 async def getPhone(message: types.Message, state: FSMContext):
     if (message.text == "Отмена"):
         await cancelCalcOrder(message, state)
     else:
         await state.update_data(phone=message.contact.phone_number)
+        await setUserPhoneAndName(user_id=message.from_user.id, phone=message.contact.phone_number,first_name=message.contact.first_name)
         await state.update_data(name=message.contact.first_name)
         balance = await getBalance(message.from_user.id)
         await message.answer(f"У вас {round(balance[0],2)} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
         await state.set_state(OrderState.setBonus)
 
+
+
 async def setBonus(message: types.Message, state: FSMContext):
     if (message.text == "Отмена"):
         await cancelCalcOrder(message, state)
     else:
+        contact = await getUserPhoneAndName(message.from_user.id)
+        await state.update_data(phone=contact[0])
+        await state.update_data(name=contact[1])
+
         if(message.text == "Да"):
             await message.answer(f"Введите сумму")
             await state.set_state(OrderState.countBonus)
@@ -85,19 +103,19 @@ async def countBonus(message: types.Message, state: FSMContext):
             await message.answer(f"Вводите число")
 
 
-docsId = []
+
 async def addFile(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    print(data['docs'])
     if(message.text=="Отмена"):
         await cancelCalcOrder(message, state)
-        docsId.clear()
 
     elif(message.text=="Готово"):
-        data = await state.get_data()
         bonusBalance = data['setBonus']
         user_id = message.from_user.id
         name = data['name']
         phone = data['phone']
-        dumpsDocsId = json.dumps(docsId)
+        dumpsDocsId = json.dumps(data['docs'])
         try:
             countPacks = data['countPack']
             volume = data['volume']
@@ -122,8 +140,8 @@ async def addFile(message: types.Message, state: FSMContext):
                 album_builder = MediaGroupBuilder(
                     caption=f"Документы к заказу"
                 )
-                if (len(docsId) > 0):
-                    for doc in docsId:
+                if (len(data['docs']) > 0):
+                    for doc in data['docs']:
                         album_builder.add(type=InputMediaType.DOCUMENT, media=doc)
                     await message.bot.send_media_group(chat_id=admin, media=album_builder.build())
 
@@ -147,8 +165,8 @@ async def addFile(message: types.Message, state: FSMContext):
                 album_builder = MediaGroupBuilder(
                     caption=f"Документы к заказу"
                 )
-                if(len(docsId) > 0):
-                    for doc in docsId:
+                if(len(data['docs']) > 0):
+                    for doc in data['docs']:
                         album_builder.add(type=InputMediaType.DOCUMENT, media=doc)
                     await message.bot.send_media_group(chat_id=admin, media=album_builder.build())
 
@@ -157,14 +175,12 @@ async def addFile(message: types.Message, state: FSMContext):
 
 
 
-
-        docsId.clear()
         await state.clear()
         await message.answer(f"В ближайшее время с вами свяжется специалист")
 
         await message.answer(f"Услуги", reply_markup=services_kb())
     else:
-        docsId.append(message.document.file_id)
+        data['docs'].append(message.document.file_id)
         await message.answer(f"Можете отправить еще один файл",reply_markup=ready_kb())
 
 
@@ -258,28 +274,29 @@ async def calcNeedPurchapse(message: types.Message, state: FSMContext):
     else:
         if(message.text == "Да" or message.text == "Нет"):
             await state.update_data(needPurchase=message.text)
-            await message.answer(f"Введите Тип (коэффицент)")
+            await message.answer(f"Введите Тип (коэффицент)",reply_markup=get_coefficient_kb())
             await state.set_state(PreOrderState.type)
         else:
             await message.answer(f"Ответье да или нет")
 
-async def calcType(message: types.Message, state: FSMContext):
+async def calcType(callback: types.CallbackQuery, state: FSMContext,callback_data: CoefficientPreOrder):
+    await callback.message.delete()
     try:
-        await state.update_data(type=float(message.text))
+        await state.update_data(type=callback_data.coefficient)
         data = await state.get_data()
         volume = data['volume'].split(' ')
         final = (( int(volume[0]) * int(volume[1]) * int(volume[2]) + int(volume[0]) * int(volume[1]) * int(volume[2]) * 0.3) * data['type']) * data['countPack'] #расчет стоимости
         await state.update_data(final=final)
-        await message.answer(f"Приблизительная цена партии будет составлять {final} рублей")
+        await callback.message.answer(f"Приблизительная цена партии будет составлять {final} рублей")
 
         #добавить сообщение админу
         for admin in Admin:
-            await message.bot.send_message(chat_id=admin, text=f"пользователь с ником @{message.from_user.username} осуществил калькуляцию на {final} рублей")
+            await callback.bot.send_message(chat_id=admin, text=f"пользователь с ником @{callback.message.from_user.username} осуществил калькуляцию на {round(final,2)} рублей")
 
-        await message.answer(f"Оформить заказ?",reply_markup=do_order_kb())
+        await callback.message.answer(f"Оформить заказ?",reply_markup=do_order_kb())
 
     except ValueError:
-        await message.answer(f"Введите Тип (коэффицент) числом")
+        await callback.message.answer(f"Введите Тип (коэффицент) числом")
 
 
 async def no(callback: types.CallbackQuery, state: FSMContext):
@@ -305,7 +322,7 @@ def register_services_user_handlers(dp: Dispatcher):
     dp.message.register(calcCount, PreOrderState.countPack)
     dp.message.register(calcVolume, PreOrderState.volume)
     dp.message.register(calcNeedPurchapse, PreOrderState.needPurchase)
-    dp.message.register(calcType, PreOrderState.type)
+    dp.callback_query.register(calcType, CoefficientPreOrder.filter())
 
     dp.callback_query.register(no, F.data == "Нет")
     dp.callback_query.register(yes, F.data == "Да")

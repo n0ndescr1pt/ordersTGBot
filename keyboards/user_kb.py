@@ -1,6 +1,8 @@
 from aiogram import types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
+from utils.callbackFactory import CoefficientPreOrder
+
 
 def main_kb():
     builder = InlineKeyboardBuilder()
@@ -162,3 +164,14 @@ def confirmOrder_kb():
         resize_keyboard=True,
     )
     return readyKeyboard
+
+def get_coefficient_kb():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="1.0", callback_data=CoefficientPreOrder(coefficient = 1.0)),
+    builder.button(text="1.2", callback_data=CoefficientPreOrder(coefficient = 1.2))
+    builder.button(text="1.5", callback_data=CoefficientPreOrder(coefficient = 1.5))
+
+    builder.adjust(3)
+
+    return builder.as_markup(resize_keyboard=True)

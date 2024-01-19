@@ -22,6 +22,7 @@ class UpdatePriceListState(StatesGroup):
 #состояния для создания заказа
 class OrderState(StatesGroup):
     getPhone = State()
+    setPhone = State()
     setBonus = State()
     countBonus = State()
     addFile = State()
@@ -51,3 +52,7 @@ class ConfirmOrderByIDState(StatesGroup):
 
 class UpdateFeedState(StatesGroup):
     updateFeed = State()
+
+class SendMessageToUserState(StatesGroup):
+    getUsername = State()
+    getMessage = State()

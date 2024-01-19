@@ -15,3 +15,6 @@ class NumbersCallbackFactorySetOrderUsPaid(CallbackData, prefix="paid_order"):
 
 class NumbersCallbackFactoryDeleteOrder(CallbackData, prefix="delete_order"):
     id: int
+
+class CoefficientPreOrder(CallbackData, prefix="coefficient"):
+    coefficient: float

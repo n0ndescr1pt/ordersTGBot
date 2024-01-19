@@ -1,7 +1,7 @@
 {
     "@squasar": {
         "orders": {},
-        "balance": 1000.0
+        "balance": 10.0
     },
     "@n0ndescr1pt": {
         "orders": {
@@ -9,39 +9,23 @@
                 "name": "nondescript",
                 "phone": "+79048208178",
                 "bonus_decreased": 10,
-                "bonus_added": 5.0,
-                "summ": 100.0,
-                "summ_with_bonus": 90.0,
-                "status": "paid"
+                "bonus_added": 50.0,
+                "summ": 1000.0,
+                "summ_with_bonus": 990.0,
+                "status": "paid",
+                "order_id": 36
             },
             "2": {
                 "name": "nondescript",
                 "phone": "+79048208178",
                 "bonus_decreased": 0,
-                "bonus_added": 500.0,
-                "summ": 10000.0,
-                "summ_with_bonus": 10000.0,
-                "status": "paid"
-            },
-            "3": {
-                "name": "nondescript",
-                "phone": "+79048208178",
-                "bonus_decreased": 100,
-                "bonus_added": 50.0,
-                "summ": 1000.0,
-                "summ_with_bonus": 900.0,
-                "status": "paid"
-            },
-            "4": {
-                "name": "nondescript",
-                "phone": "+79048208178",
-                "bonus_decreased": 0,
-                "bonus_added": 500.0,
-                "summ": 10000.0,
-                "summ_with_bonus": 10000.0,
-                "status": "paid"
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": null,
+                "status": "unconfirmed",
+                "order_id": 37
             }
         },
-        "balance": 500.0
+        "balance": 100.0
     }
 }

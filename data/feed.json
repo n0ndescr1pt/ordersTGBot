@@ -5,5 +5,65 @@
   },
   "bonus_prog": {
     "condition": "условия 123"
+  },
+
+  "galery": {
+    "marketplace": {
+      "1": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      },
+      "2": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      }
+    },
+    "present": {
+      "1": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      },
+      "2": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      }
+    },
+    "individualPack": {
+      "1": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      },
+      "2": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      }
+    },
+    "fullfillment": {
+      "1": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      },
+      "2": {
+        "caption": "text",
+        "imgs": {
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+        }
+      }
+    }
   }
+
 }

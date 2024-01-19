@@ -42,6 +42,8 @@ async def edit_individual_pack(callback: types.CallbackQuery, state: FSMContext)
     await state.set_state(Galery.choose)
 
 async def choose_edit_delete_galery(message: types.Message, state: FSMContext):
+    imgs = []
+    await state.update_data(imgs=imgs)
     if (message.text == "Отмена"):
         await cancelEditGalery(message, state)
     else:
@@ -84,19 +86,17 @@ async def delete_galery(callback: types.CallbackQuery, state: FSMContext, callba
 
 
 #добавление
-imgs = []
 async def get_galery_photo(message: types.Message, state: FSMContext):
+    data = await state.get_data()
     if (message.text == "Отмена"):
         await cancelEditGalery(message, state)
-        imgs.clear()
     elif(message.text == "Готово"):
-        await state.update_data(photos=json.dumps(imgs))
+        await state.update_data(photos=json.dumps(data['imgs']))
         await message.answer(f"Отправьте описание",reply_markup=add_photo_kb())
-        imgs.clear()
         await state.set_state(Galery.getGaleryCaption)
     else:
         photos = message.photo
-        imgs.append(photos[0].file_id)
+        data['imgs'].append(photos[0].file_id)
 
 async def get_galery_caption(message: types.Message, state: FSMContext):
     if (message.text == "Отмена"):

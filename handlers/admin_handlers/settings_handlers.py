@@ -4,7 +4,7 @@ from aiogram import types, Dispatcher, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 
-from data.database.function import updateGalery
+from data.database.function import updateGalery, deleteAllGalery
 from keyboards.admin_kb import settings_kb
 from utils.someMethods import cancelUpdatePriceList
 from utils.states import UpdatePriceListState, UpdateFeedState
@@ -34,6 +34,7 @@ async def uploadPriceList(message: types.Message, state:FSMContext):
 async def downloadFeed(callback: types.CallbackQuery):
     await callback.message.delete()
     statistics = FSInputFile("data/feed.json")
+
     await callback.message.answer_document(document=statistics,
                                            caption=f"Текущий ФИД")
     await callback.message.answer(f"Настройки", reply_markup=settings_kb())
@@ -47,6 +48,7 @@ async def uploadFeed(message: types.Message, state:FSMContext):
     if (message.text == "Отмена"):
         await cancelUpdatePriceList(message, state)
     else:
+        await deleteAllGalery()
         document = message.document
         await message.bot.download(file=document, destination="data/feed.json")
 

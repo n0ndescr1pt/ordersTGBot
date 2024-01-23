@@ -16,11 +16,12 @@ import datetime
 
 async def start(message: types.Message, state: FSMContext):
     class Password:
-        def __init__(self, attemp, last_try):
+        def __init__(self, attemp, last_try, count_try):
             """Constructor"""
             self.attemp = attemp
             self.last_try = last_try
-    await state.update_data(attemps=Password(attemp=5,last_try=None))
+            self.count_try = count_try
+    await state.update_data(attemps=Password(attemp=5,last_try=None, count_try=0))
 
     await message.answer(f"Введите пароль для доступа к админ панели", reply_markup=cancel_kb())
     await state.set_state(CheckAdminState.password)
@@ -38,8 +39,9 @@ async def checkAdmin(message: types.Message, state: FSMContext):
             await state.clear()
         else:
             data['attemps'].attemp-=1
-            await message.answer(f"Неверный пароль")
-            if (data['attemps'].attemp<1):
+            await message.answer(f"Неверный пароль, осталось {data['attemps'].attemp} попытки")
+            if (data['attemps'].attemp<=1):
+                data['attemps'].count_try +=1
                 data['attemps'].last_try = datetime.datetime.now()
                 await state.set_state(CheckAdminState.wrongPassword)
 
@@ -49,7 +51,9 @@ async def wrongPass(message: types.Message, state: FSMContext):
         await state.clear()
         await message.answer(f"Главная", reply_markup=main_kb())
     else:
-        if (datetime.datetime.now() > data['attemps'].last_try + datetime.timedelta(minutes=1)):
+        time = {"1":0.30,"2":1,"3":5,"4":10}
+        cooldown = time[f"{data['attemps'].count_try}"]
+        if (datetime.datetime.now() > data['attemps'].last_try + datetime.timedelta(minutes=cooldown)):
             if (message.text == password):
                 await message.answer(f"Главная (админка)", reply_markup=main_admin_kb())
                 await state.clear()
@@ -58,7 +62,7 @@ async def wrongPass(message: types.Message, state: FSMContext):
                 await message.answer(f"Неверный пароль", reply_markup=cancel_kb())
                 await state.set_state(CheckAdminState.password)
         else:
-            await message.answer(f"Подождите перед следующей попыткой")
+            await message.answer(f"Подождите {round(((data['attemps'].last_try + datetime.timedelta(minutes=cooldown) - datetime.datetime.now()).seconds)/60,2)} минут перед следующей попыткой")
 
 
 async def sendMessageToUser(callback: types.CallbackQuery, state: FSMContext):

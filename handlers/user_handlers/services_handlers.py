@@ -48,7 +48,7 @@ async def order(callback: types.CallbackQuery, state: FSMContext):
             await callback.message.answer(f"Для удобной связи нужен ваш телефон", reply_markup=getPhone_kb())
             await state.set_state(OrderState.getPhone)
         else:
-            await callback.message.answer(f"Телефон был сохранен")
+            await callback.message.answer(f"к заказу будет прикреплен ваш номер телефона")
             balance = await getBalance(callback.from_user.id)
             print(balance)
             await callback.message.answer(f"У вас {round(balance[0], 2)} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
@@ -287,7 +287,7 @@ async def calcType(callback: types.CallbackQuery, state: FSMContext,callback_dat
         volume = data['volume'].split(' ')
         final = (( int(volume[0]) * int(volume[1]) * int(volume[2]) + int(volume[0]) * int(volume[1]) * int(volume[2]) * 0.3) * data['type']) * data['countPack'] #расчет стоимости
         await state.update_data(final=final)
-        await callback.message.answer(f"Приблизительная цена партии будет составлять {final} рублей")
+        await callback.message.answer(f"Приблизительная цена партии будет составлять {round(final,2)} рублей")
 
         #добавить сообщение админу
         for admin in Admin:

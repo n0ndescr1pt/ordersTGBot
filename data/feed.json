@@ -3,6 +3,7 @@
     "about_company": "company infooo 123",
     "judicial_info": "hudicial_info 123"
   },
+
   "bonus_prog": {
     "condition": "условия 123"
   },
@@ -10,13 +11,13 @@
   "galery": {
     "marketplace": {
       "1": {
-        "caption": "text",
+        "caption": "первая",
         "imgs": {
           "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
         }
       },
       "2": {
-        "caption": "text",
+        "caption": "вторая",
         "imgs": {
           "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
         }
@@ -24,13 +25,13 @@
     },
     "present": {
       "1": {
-        "caption": "text",
+        "caption": "десятая",
         "imgs": {
           "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
         }
       },
       "2": {
-        "caption": "text",
+        "caption": "пятая",
         "imgs": {
           "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
         }
@@ -38,13 +39,13 @@
     },
     "individualPack": {
       "1": {
-        "caption": "text",
+        "caption": "шестая",
         "imgs": {
           "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
         }
       },
       "2": {
-        "caption": "text",
+        "caption": "девятая",
         "imgs": {
           "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
         }
@@ -54,7 +55,10 @@
       "1": {
         "caption": "text",
         "imgs": {
-          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
+          "1": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg",
+          "2": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg",
+          "3": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg",
+          "4": "https://w.forfun.com/fetch/5d/5d3aacefdbaad0ae0ad149dfc915613f.jpeg"
         }
       },
       "2": {

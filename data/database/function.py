@@ -151,4 +151,8 @@ async def updateGalery(galery_id, images, caption):
     connection.close()
 
 
-
+async def deleteAllGalery():
+    connection = sqlite3.connect('data/database/database.db')
+    connection.execute("DELETE FROM galery WHERE id > 0")
+    connection.commit()
+    connection.close()

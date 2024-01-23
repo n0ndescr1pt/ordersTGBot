@@ -1,31 +1,96 @@
 {
-    "@squasar": {
-        "orders": {},
-        "balance": 10.0
-    },
     "@n0ndescr1pt": {
         "orders": {
             "1": {
-                "name": "nondescript",
-                "phone": "+79048208178",
-                "bonus_decreased": 10,
-                "bonus_added": 50.0,
-                "summ": 1000.0,
-                "summ_with_bonus": 990.0,
-                "status": "paid",
-                "order_id": 36
-            },
-            "2": {
-                "name": "nondescript",
-                "phone": "+79048208178",
-                "bonus_decreased": 0,
+                "name": 713246526,
+                "phone": 10,
+                "bonus_decreased": 36,
                 "bonus_added": 0,
                 "summ": null,
-                "summ_with_bonus": null,
-                "status": "unconfirmed",
-                "order_id": 37
+                "summ_with_bonus": "paid",
+                "status": null,
+                "order_id": "+79048208178"
+            },
+            "2": {
+                "name": 713246526,
+                "phone": 0,
+                "bonus_decreased": 37,
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": "unconfirmed",
+                "status": null,
+                "order_id": "+79048208178"
+            },
+            "3": {
+                "name": 713246526,
+                "phone": 0,
+                "bonus_decreased": 40,
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": "unconfirmed",
+                "status": null,
+                "order_id": "+79048208178"
+            },
+            "4": {
+                "name": 713246526,
+                "phone": 0,
+                "bonus_decreased": 41,
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": "unconfirmed",
+                "status": null,
+                "order_id": "+79048208178"
+            },
+            "5": {
+                "name": 713246526,
+                "phone": 0,
+                "bonus_decreased": 42,
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": "unconfirmed",
+                "status": null,
+                "order_id": "+79048208178"
+            },
+            "6": {
+                "name": 713246526,
+                "phone": 0,
+                "bonus_decreased": 43,
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": "unconfirmed",
+                "status": null,
+                "order_id": "+79048208178"
+            },
+            "7": {
+                "name": 713246526,
+                "phone": 0,
+                "bonus_decreased": 44,
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": "unconfirmed",
+                "status": null,
+                "order_id": "+79048208178"
             }
         },
-        "balance": 100.0
+        "balance": 0.0
+    },
+    "@SoloCreep": {
+        "orders": {},
+        "balance": 0.0
+    },
+    "@squasar": {
+        "orders": {
+            "1": {
+                "name": 1052856431,
+                "phone": 0,
+                "bonus_decreased": 45,
+                "bonus_added": 0,
+                "summ": null,
+                "summ_with_bonus": "paid",
+                "status": null,
+                "order_id": "+79087980039"
+            }
+        },
+        "balance": 50.0
     }
 }

@@ -16,7 +16,7 @@ async def uploadStat(callback: types.CallbackQuery):
         n_data[user[1]] = {"orders":{}}
         i = 0
         for order in stat:
-            if(order[4] == user[0]):
+            if(order[0] == user[0]):
                 if (order[15] == None):
                     bonus = 0
                 else:
@@ -32,8 +32,8 @@ async def uploadStat(callback: types.CallbackQuery):
                                                 "order_id": order[3]
                                                 }
 
-        n_data[user[1]]["balance"] = user[2]
 
+        n_data[user[1]]["balance"] = user[2]
     with open("data/stats.json", "w", encoding='utf-8') as outf:
         json.dump(n_data, outf, ensure_ascii=False, indent=4)
 

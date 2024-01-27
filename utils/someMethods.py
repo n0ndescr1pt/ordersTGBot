@@ -43,3 +43,16 @@ async def getGaleryItems(message: types.Message,galery_id, galery_name):
             album_builder.add(type="photo", media=img)
 
         await message.answer_media_group(media=album_builder.build())
+
+async def getGaleryItemsForUser(message: types.Message,galery_id, galery_name):
+    galeryItems = await selectGalery(galery_id)
+    await message.answer(text=f"Текущая галерея: {galery_name}")
+    for item in galeryItems:
+        list_img = re.findall(r'\"(.*?)\"', item[2])
+        album_builder = MediaGroupBuilder(
+            caption=f"{item[3]}"
+        )
+        for img in list_img:
+            album_builder.add(type="photo", media=img)
+
+        await message.answer_media_group(media=album_builder.build())

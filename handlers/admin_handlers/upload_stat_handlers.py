@@ -17,19 +17,20 @@ async def uploadStat(callback: types.CallbackQuery):
         i = 0
         for order in stat:
             if(order[0] == user[0]):
-                if (order[15] == None):
+                if (order[17] == None):
                     bonus = 0
                 else:
-                    bonus = int(order[15]) * 0.05
+                    bonus = int(order[17]) * 0.05
                 i+=1
-                n_data[user[1]]["orders"][i] = {"name":order[6],
-                                                "phone":order[7],
-                                                "bonus_decreased": order[5],
+                n_data[user[1]]["orders"][i] = {"name":order[4],
+                                                "phone":order[3],
+                                                "email": order[19],
+                                                "bonus_decreased": order[7],
                                                 "bonus_added": bonus,
-                                                "summ": order[15],
-                                                "summ_with_bonus": order[16],
-                                                "status": order[14],
-                                                "order_id": order[3]
+                                                "summ": order[17],
+                                                "summ_with_bonus": order[18],
+                                                "status": order[16],
+                                                "order_id": order[2]
                                                 }
 
 

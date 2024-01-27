@@ -19,16 +19,16 @@ async def getBalance(user_id: int):
     return balance
 
 
-async def insertOrder(user_id: int, bonus_balance, name, phone, docs_id,status):
+async def insertOrder(user_id: int, bonus_balance, name, phone, docs_id,status,email):
     connection = sqlite3.connect('data/database/database.db')
-    orderID = connection.execute("INSERT INTO orders (user_id, bonus_decrease, name, phone, files, status) VALUES (?,?,?,?,?,?)", (user_id, bonus_balance, name, phone, docs_id, status)).lastrowid
+    orderID = connection.execute("INSERT INTO orders (user_id, bonus_decrease, name, phone, files, status,email) VALUES (?,?,?,?,?,?,?)", (user_id, bonus_balance, name, phone, docs_id, status, email)).lastrowid
     connection.commit()
     connection.close()
     return orderID
 
-async def insertOrderWithCalc(user_id: int, bonus_balance, name, phone, docs_id, count_packs, volume,needPurchase, ratio, calc_summ, status):
+async def insertOrderWithCalc(user_id: int, bonus_balance, name, phone, docs_id, count_packs, volume,needPurchase, ratio, calc_summ, status, email):
     connection = sqlite3.connect('data/database/database.db')
-    orderID = connection.execute("INSERT INTO orders (user_id, bonus_decrease, name, phone, files, count_packs, volume,needPurchase, ratio, calc_summ, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",(user_id, bonus_balance, name, phone, docs_id,count_packs, volume,needPurchase, ratio, calc_summ, status)).lastrowid
+    orderID = connection.execute("INSERT INTO orders (user_id, bonus_decrease, name, phone, files, count_packs, volume,needPurchase, ratio, calc_summ, status, email) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",(user_id, bonus_balance, name, phone, docs_id,count_packs, volume,needPurchase, ratio, calc_summ, status,email)).lastrowid
     connection.commit()
     connection.close()
     return orderID
@@ -120,7 +120,7 @@ async def deleteOrderFromDB(order_id: int):
 async def getOrderStatus(order_id: int):
     connection = sqlite3.connect('data/database/database.db')
     cursor = connection.cursor()
-    stat = cursor.execute("SELECT status FROM orders where order_id = ?", (order_id,)).fetchone()
+    stat = cursor.execute("SELECT status, real_summ, user_id FROM orders where order_id = ?", (order_id,)).fetchone()
     connection.close()
     return stat
 

@@ -1,23 +1,21 @@
 import json
+import re
 
 from aiogram import types, Dispatcher, F
 from aiogram.enums import InputMediaType
 
-from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 from aiogram.utils.media_group import MediaGroupBuilder
 
-from data.config import Admin
-from data.database.function import getBalance, insertOrder, insertOrderWithCalc, confirmOrderStatus, confirmOrderPaid, \
-    deleteOrderFromDB, getOrderStatus, getUserPhoneAndName, setUserPhoneAndName
-from keyboards.admin_kb import cancel_kb, confirm_order_kb, setOrderAsPaid_kb
-from keyboards.user_kb import services_kb, yesNo_kb, do_order_kb, getPhone_kb, \
-    ready_kb, get_coefficient_kb
+from data.config import Admin, chat
+from data.database.function import getBalance, insertOrder, insertOrderWithCalc, getUserPhoneAndName, setUserPhoneAndName
+from keyboards.admin_kb import confirm_order_kb, calculate_order_kb
+from keyboards.user_kb import services_kb, yesNo_kb, getPhone_kb, ready_kb
 from utils.callbackFactory import NumbersCallbackFactoryConfirmOrder, NumbersCallbackFactorySetOrderUsPaid, \
-    NumbersCallbackFactoryDeleteOrder, CoefficientPreOrder
-from utils.someMethods import cancelCalcOrder, cancelConfirmOrder
-from utils.states import PreOrderState, OrderState, ConfirmOrderState
+    NumbersCallbackFactoryDeleteOrder, NumbersCallbackFactorySetOrderAsReadyToSend
+from utils.someMethods import cancelCalcOrder
+from utils.states import OrderState, ConfirmOrderState
 
 
 async def priceList(callback: types.CallbackQuery):
@@ -25,6 +23,7 @@ async def priceList(callback: types.CallbackQuery):
 
     document = FSInputFile('data/prices.xlsx')
     await callback.message.answer_document(document)
+    await callback.message.answer(f"(не является публичной оффертой)")
     await callback.message.answer(f"Услуги", reply_markup=services_kb())
 
 
@@ -36,36 +35,51 @@ async def supportAdmin(callback: types.CallbackQuery):
     await callback.message.answer(f"Услуги", reply_markup=services_kb())
 
 
+
+
+
 async def order(callback: types.CallbackQuery, state: FSMContext):
     if (callback.message.text == "Отмена"):
         await cancelCalcOrder(callback.message, state)
     else:
         await callback.message.delete()
         phone = await getUserPhoneAndName(callback.from_user.id)
-        docsId = []
-        await state.update_data(docs=docsId)
+
         if(phone[0] == None):
             await callback.message.answer(f"Для удобной связи нужен ваш телефон", reply_markup=getPhone_kb())
             await state.set_state(OrderState.getPhone)
         else:
-            await callback.message.answer(f"к заказу будет прикреплен ваш номер телефона")
-            balance = await getBalance(callback.from_user.id)
-            print(balance)
-            await callback.message.answer(f"У вас {round(balance[0], 2)} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
-            await state.set_state(OrderState.setBonus)
-
+            docsId = []
+            await state.update_data(docs=docsId)
+            await callback.message.answer(f"K заказу будет прикреплен ваш номер телефона")
+            await callback.message.answer(f"Введите ваш email")
+            await state.set_state(OrderState.getEmail)
 
 
 async def getPhone(message: types.Message, state: FSMContext):
     if (message.text == "Отмена"):
         await cancelCalcOrder(message, state)
     else:
+        docsId = []
+        await state.update_data(docs=docsId)
         await state.update_data(phone=message.contact.phone_number)
         await setUserPhoneAndName(user_id=message.from_user.id, phone=message.contact.phone_number,first_name=message.contact.first_name)
         await state.update_data(name=message.contact.first_name)
-        balance = await getBalance(message.from_user.id)
-        await message.answer(f"У вас {round(balance[0],2)} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
-        await state.set_state(OrderState.setBonus)
+        await message.answer(f"Введите ваш email")
+        await state.set_state(OrderState.getEmail)
+
+async def getEmail(message: types.Message, state: FSMContext):
+    if (message.text == "Отмена"):
+        await cancelCalcOrder(message, state)
+    else:
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+        if re.fullmatch(regex, message.text):
+            await state.update_data(email=message.text)
+            balance = await getBalance(message.from_user.id)
+            await message.answer(f"У вас {round(balance[0],2)} бонусов, списываем бонусы?", reply_markup=yesNo_kb())
+            await state.set_state(OrderState.setBonus)
+        else:
+            await message.answer(f"Введен некорректный email")
 
 
 
@@ -106,7 +120,7 @@ async def countBonus(message: types.Message, state: FSMContext):
 
 async def addFile(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    print(data['docs'])
+
     if(message.text=="Отмена"):
         await cancelCalcOrder(message, state)
 
@@ -116,6 +130,7 @@ async def addFile(message: types.Message, state: FSMContext):
         name = data['name']
         phone = data['phone']
         dumpsDocsId = json.dumps(data['docs'])
+        email = data['email']
         try:
             countPacks = data['countPack']
             volume = data['volume']
@@ -123,11 +138,12 @@ async def addFile(message: types.Message, state: FSMContext):
             ratio = data['type']
             final = data['final']
 
-            orderID = await insertOrderWithCalc(user_id, bonusBalance, name, phone, dumpsDocsId, countPacks, volume, needPurchase ,ratio,final,"unconfirmed")
-            for admin in Admin:
-                await message.bot.send_message(chat_id=admin,
+            orderID = await insertOrderWithCalc(user_id, bonusBalance, name, phone, dumpsDocsId, countPacks, volume, needPurchase ,ratio,final,"unconfirmed",email)
+
+            await message.bot.send_message(chat_id=chat,
                                                text=f"пользователь с ником @{message.from_user.username} оформил заказ с калькуляцией на {final} рублей, "
                                                     f"\nНомер телефона: {phone}"
+                                                    f"\nemail: {email}"
                                                     f"\nИмя: {name}"
                                                     f"\nСписанные бонусы: {bonusBalance}"
                                                     f"\nКоличество упаковок: {countPacks}"
@@ -137,41 +153,39 @@ async def addFile(message: types.Message, state: FSMContext):
                                                     f"\nid заказа: {orderID}")
 
 
-                album_builder = MediaGroupBuilder(
-                    caption=f"Документы к заказу"
-                )
-                if (len(data['docs']) > 0):
-                    for doc in data['docs']:
-                        album_builder.add(type=InputMediaType.DOCUMENT, media=doc)
-                    await message.bot.send_media_group(chat_id=admin, media=album_builder.build())
-
-                await message.bot.send_message(chat_id=admin,
-                                               text=f"Для подтверждения заказа нажмите на кнопку",
-                                               reply_markup=await confirm_order_kb(orderID))
+            album_builder = MediaGroupBuilder(
+                caption=f"Документы к заказу"
+            )
+            if (len(data['docs']) > 0):
+                for doc in data['docs']:
+                    album_builder.add(type=InputMediaType.DOCUMENT, media=doc)
+                await message.bot.send_media_group(chat_id=chat, media=album_builder.build())
+            await message.bot.send_message(chat_id=chat,
+                                           text=f"Для подтверждения заказа нажмите на кнопку",
+                                           reply_markup= await calculate_order_kb(orderID))
 
 
         except KeyError:
-            orderID = await insertOrder(user_id, bonusBalance, name, phone, dumpsDocsId, "unconfirmed")
+            orderID = await insertOrder(user_id, bonusBalance, name, phone, dumpsDocsId, "unconfirmed",email)
 
 
-            for admin in Admin:
-                await message.bot.send_message(chat_id=admin,
-                                               text=f"пользователь с ником @{message.from_user.username} оформил заказ, "
-                                                    f"\nНомер телефона: {phone}"
-                                                    f"\nИмя: {name}"
-                                                    f"\nСписанные бонусы: {bonusBalance}"
-                                                    f"\nid заказа: {orderID}")
 
-                album_builder = MediaGroupBuilder(
-                    caption=f"Документы к заказу"
-                )
-                if(len(data['docs']) > 0):
-                    for doc in data['docs']:
-                        album_builder.add(type=InputMediaType.DOCUMENT, media=doc)
-                    await message.bot.send_media_group(chat_id=admin, media=album_builder.build())
-
-                await message.bot.send_message(chat_id=admin,
-                                               text=f"Для подтверждения заказа нажмите на кнопку", reply_markup= await confirm_order_kb(orderID))
+            await message.bot.send_message(chat_id=chat,
+                                           text=f"пользователь с ником @{message.from_user.username} оформил заказ, "
+                                                f"\nНомер телефона: {phone}"
+                                                f"\nemail: {email}"
+                                                f"\nИмя: {name}"
+                                                f"\nСписанные бонусы: {bonusBalance}"
+                                                f"\nid заказа: {orderID}")
+            album_builder = MediaGroupBuilder(
+                caption=f"Документы к заказу"
+            )
+            if(len(data['docs']) > 0):
+                for doc in data['docs']:
+                    album_builder.add(type=InputMediaType.DOCUMENT, media=doc)
+                await message.bot.send_media_group(chat_id=chat, media=album_builder.build())
+            await message.bot.send_message(chat_id=chat,
+                                           text=f"Для подтверждения заказа нажмите на кнопку", reply_markup= await calculate_order_kb(orderID))
 
 
 
@@ -184,156 +198,13 @@ async def addFile(message: types.Message, state: FSMContext):
         await message.answer(f"Можете отправить еще один файл",reply_markup=ready_kb())
 
 
-async def confirmOrder(callback: types.CallbackQuery, state: FSMContext, callback_data: NumbersCallbackFactoryConfirmOrder):
-    if (callback.message.text == "Отмена"):
-        await cancelCalcOrder(callback.message, state)
-    else:
-        await state.update_data(orderID=callback_data.id)
-        await callback.message.edit_text(text=callback.message.text,reply_markup=await setOrderAsPaid_kb(callback_data.id))
-        await callback.message.answer(f"Введите сумму за этот заказ")
-        await state.set_state(ConfirmOrderState.setSumm)
-
-async def confirmOrderSumm(message: types.Message, state: FSMContext):
-    if (message.text == "Отмена"):
-        await cancelConfirmOrder(message, state)
-    else:
-        data = await state.get_data()
-        order_id = data['orderID']
-        order_status = await getOrderStatus(order_id)
-        if(order_status[0]=="confirm"):
-            await message.answer(f"Заказ {order_id} уже подтвежден")
-        elif (order_status[0] == "paid"):
-            await message.answer(f"Заказ {order_id} уже оплачен")
-        else:
-            try:
-                await state.update_data(orderSumm=message.text)
-                data = await state.get_data()
-                order_id = data['orderID']
-                orderSumm = data['orderSumm']
-                status = "confirm"
-                await confirmOrderStatus(order_id=int(order_id),summ=float(orderSumm), status=status)
-                await message.answer(f"Заказ {order_id} успешно подтвержден")
-                await state.clear()
-            except ValueError:
-                data = await state.get_data()
-                order_id = data['orderID']
-                await message.answer(f"Введите сумму для заказа {order_id}")
-
-async def SetOrderUsPaid(callback: types.CallbackQuery, callback_data: NumbersCallbackFactorySetOrderUsPaid):
-    order_status = await getOrderStatus(callback_data.id)
-    if (order_status[0] == "paid"):
-        await callback.message.answer(f"Заказ {callback_data.id} уже подтвежден")
-    else:
-        user_id = await confirmOrderPaid(callback_data.id, "paid")
-        await callback.message.answer(f"Заказ {callback_data.id} отмечен как оплачен")
-        await callback.bot.send_message(chat_id=user_id[0],text=f"Оплата заказа подтверждена, заказ находится в обработке")
-        await callback.message.delete()
-
-async def deleteOrder(callback: types.CallbackQuery, callback_data: NumbersCallbackFactoryDeleteOrder):
-    await deleteOrderFromDB(callback_data.id)
-    await callback.message.answer(f"Заказ {callback_data.id} удален")
-    await callback.message.delete()
-
-
-
-
-
-#предварительный расчет
-async def preOrder(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-    await callback.message.answer(f"Для расчета приблизительной стоимости введите количество упаковок", reply_markup=cancel_kb())
-    await state.set_state(PreOrderState.countPack)
-
-async def calcCount(message: types.Message, state: FSMContext):
-    try:
-        if (message.text == "Отмена"):
-            await cancelCalcOrder(message, state)
-        else:
-            await state.update_data(countPack=int(message.text))
-            await message.answer(f"Введите Длинну Ширину Высоту (через пробел в сантиметрах)", reply_markup=cancel_kb())
-            await state.set_state(PreOrderState.volume)
-    except ValueError:
-        await message.answer(f"Введите целое число")
-
-async def calcVolume(message: types.Message, state: FSMContext):
-    if (message.text == "Отмена"):
-        await cancelCalcOrder(message, state)
-    else:
-        volume = message.text.split(' ')
-        #проверка правильно ли пользователь ввел длину ширину и высоту
-        if(len(volume) == 3 and volume[0].isdigit() and volume[1].isdigit() and volume[2].isdigit()):
-            await state.update_data(volume=message.text)
-            await message.answer(f"Необходима ли закупка", reply_markup=yesNo_kb())
-            await state.set_state(PreOrderState.needPurchase)
-        else:
-            await message.answer(f"Введите Длинну Ширину Высоту (через пробел в сантиметрах)")
-
-async def calcNeedPurchapse(message: types.Message, state: FSMContext):
-    if (message.text == "Отмена"):
-        await cancelCalcOrder(message, state)
-    else:
-        if(message.text == "Да" or message.text == "Нет"):
-            await state.update_data(needPurchase=message.text)
-            await message.answer(f"Введите Тип (коэффицент)",reply_markup=get_coefficient_kb())
-            await state.set_state(PreOrderState.type)
-        else:
-            await message.answer(f"Ответье да или нет")
-
-async def calcType(callback: types.CallbackQuery, state: FSMContext,callback_data: CoefficientPreOrder):
-    await callback.message.delete()
-    try:
-        await state.update_data(type=callback_data.coefficient)
-        data = await state.get_data()
-        volume = data['volume'].split(' ')
-        final = (( int(volume[0]) * int(volume[1]) * int(volume[2]) + int(volume[0]) * int(volume[1]) * int(volume[2]) * 0.3) * data['type']) * data['countPack'] #расчет стоимости
-        await state.update_data(final=final)
-        await callback.message.answer(f"Приблизительная цена партии будет составлять {round(final,2)} рублей")
-
-        #добавить сообщение админу
-        for admin in Admin:
-            await callback.bot.send_message(chat_id=admin, text=f"пользователь с ником @{callback.message.from_user.username} осуществил калькуляцию на {round(final,2)} рублей")
-
-        await callback.message.answer(f"Оформить заказ?",reply_markup=do_order_kb())
-
-    except ValueError:
-        await callback.message.answer(f"Введите Тип (коэффицент) числом")
-
-
-async def no(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-    await state.clear()
-    await callback.message.answer(f"Услуги", reply_markup=services_kb())
-
-async def yes(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-
-    await callback.message.answer(f"Для удобной связи нужен ваш телефон", reply_markup=getPhone_kb())
-    await state.set_state(OrderState.getPhone)
-
-#конец предварительного расчета
-
-
 def register_services_user_handlers(dp: Dispatcher):
     dp.callback_query.register(priceList, F.data == "Прайс лист")
     dp.callback_query.register(supportAdmin, F.data == "Связь со спецом")
     dp.callback_query.register(order, F.data == "Оформить заказ")
-    dp.callback_query.register(preOrder, F.data == "Предварительный расчет", StateFilter(None))
-
-    dp.message.register(calcCount, PreOrderState.countPack)
-    dp.message.register(calcVolume, PreOrderState.volume)
-    dp.message.register(calcNeedPurchapse, PreOrderState.needPurchase)
-    dp.callback_query.register(calcType, CoefficientPreOrder.filter())
-
-    dp.callback_query.register(no, F.data == "Нет")
-    dp.callback_query.register(yes, F.data == "Да")
 
     dp.message.register(getPhone, OrderState.getPhone)
     dp.message.register(setBonus, OrderState.setBonus)
     dp.message.register(countBonus, OrderState.countBonus)
     dp.message.register(addFile, OrderState.addFile)
-
-    dp.callback_query.register(confirmOrder, NumbersCallbackFactoryConfirmOrder.filter())
-    dp.callback_query.register(deleteOrder, NumbersCallbackFactoryDeleteOrder.filter())
-    dp.message.register(confirmOrderSumm, ConfirmOrderState.setSumm)
-
-    dp.callback_query.register(SetOrderUsPaid, NumbersCallbackFactorySetOrderUsPaid.filter())
+    dp.message.register(getEmail, OrderState.getEmail)

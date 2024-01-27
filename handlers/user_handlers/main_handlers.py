@@ -26,7 +26,7 @@ async def services(callback: types.CallbackQuery):
     await callback.message.edit_text(f"Услуги", reply_markup=services_kb())
 
 async def back(callback: types.CallbackQuery):
-    await callback.message.edit_text(f"Главная", reply_markup=main_kb()) #спросить поэтому поводу что оно переотпраляется
+    await callback.message.edit_text(f"Главная", reply_markup=main_kb())
 
 
 

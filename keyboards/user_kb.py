@@ -26,9 +26,6 @@ def bonus_kb():
         types.InlineKeyboardButton(text="Учавствовать", callback_data="Учавствовать")
     ),
     builder.row(
-        types.InlineKeyboardButton(text="Услуги", callback_data="Услуги")
-    ),
-    builder.row(
         types.InlineKeyboardButton(text="Назад", callback_data="Назад")
     )
     return builder.as_markup(resize_keyboard=True)
@@ -53,9 +50,6 @@ def aboutUs_kb():
     builder = InlineKeyboardBuilder()
 
     builder.button(text="О компании",callback_data="О компании"),
-    builder.button(text="Галерея", callback_data="Галерея")
-
-    builder.button(text="Услуги", callback_data="Услуги"),
     builder.button(text="Юридическая информация", callback_data="Юридическая информация")
 
     builder.button(text="Назад", callback_data="Назад")
@@ -70,7 +64,7 @@ def services_kb():
     builder.button(text="Прайс лист", callback_data="Прайс лист"),
     builder.button(text="Связь со спецом", callback_data="Связь со спецом")
 
-    builder.button(text="Оформить заказ", callback_data="Оформить заказ"),
+    builder.button(text="Оформить заявку", callback_data="Оформить заказ"),
     builder.button(text="Предварительный расчет", callback_data="Предварительный расчет")
 
     builder.button(text="Назад", callback_data="Назад")
@@ -146,16 +140,18 @@ def ready_kb():
 def confirmOrder_kb():
     kb = [
         [
+            types.KeyboardButton(text="Отметить как рассчитан"),
             types.KeyboardButton(text="Подтвердить")
         ],
         [
-            types.KeyboardButton(text="Отметить как оплачено")
+            types.KeyboardButton(text="Отметить как оплачено"),
+            types.KeyboardButton(text="Отменить заказ")
         ],
         [
         types.KeyboardButton(text="Удалить")
         ],
         [
-            types.KeyboardButton(text="Отменить")
+            types.KeyboardButton(text="Отменить действие")
         ],
     ]
     readyKeyboard = types.ReplyKeyboardMarkup(

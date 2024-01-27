@@ -14,10 +14,13 @@ from handlers.user_handlers.about_us_handlers import register_aboutUs_user_handl
 from handlers.user_handlers.bonus_prog_handlers import register_bonus_user_handlers
 from handlers.user_handlers.galery_handlers import register_galery_user_handlers
 from handlers.user_handlers.main_handlers import register_main_user_handlers
+from handlers.user_handlers.order.pre_order import register_services_preOrder_user_handlers
+from handlers.user_handlers.order.set_order_state import register_services_set_orderState_user_handlers
 from handlers.user_handlers.services_handlers import register_services_user_handlers
 from utils.commands import set_commands
 
-
+#добавить проверки по айди на админов
+#отменить действие
 
 async def register_handler(dp: Dispatcher):
     register_main_user_handlers(dp)
@@ -25,6 +28,8 @@ async def register_handler(dp: Dispatcher):
     register_galery_user_handlers(dp)
     register_services_user_handlers(dp)
     register_aboutUs_user_handlers(dp)
+    register_services_preOrder_user_handlers(dp)
+    register_services_set_orderState_user_handlers(dp)
 
     register_main_admin_handlers(dp)
     register_settings_admin_handlers(dp)

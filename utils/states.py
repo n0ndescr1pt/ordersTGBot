@@ -23,6 +23,7 @@ class UpdatePriceListState(StatesGroup):
 class OrderState(StatesGroup):
     getPhone = State()
     setPhone = State()
+    getEmail = State()
     setBonus = State()
     countBonus = State()
     addFile = State()

@@ -3,7 +3,8 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from data.database.function import selectGalery, selectOrder
 from utils.callbackFactory import NumbersCallbackFactoryEdit, NumbersCallbackFactoryDelete, \
-    NumbersCallbackFactoryConfirmOrder, NumbersCallbackFactorySetOrderUsPaid, NumbersCallbackFactoryDeleteOrder
+    NumbersCallbackFactoryConfirmOrder, NumbersCallbackFactorySetOrderUsPaid, NumbersCallbackFactoryDeleteOrder, \
+    NumbersCallbackFactorySetOrderAsReadyToSend, NumbersCallbackFactoryCalcOrder, NumbersCallbackFactoryCancelOrder
 
 
 def main_admin_kb():
@@ -124,10 +125,21 @@ async def delete_galery_items_kb(galeryID):
     return builder.as_markup()
 
 
+async def calculate_order_kb(orderdID):
+    builder = InlineKeyboardBuilder()
+    builder.button(text=f"Отметить заказ как рассчитан", callback_data=NumbersCallbackFactoryCalcOrder(id=orderdID)),
+    builder.button(text=f"Отменить", callback_data=NumbersCallbackFactoryCancelOrder(id=orderdID)),
+    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID))
+
+    builder.adjust(1)
+
+    return builder.as_markup()
+
 async def confirm_order_kb(orderdID):
     builder = InlineKeyboardBuilder()
     builder.button(text=f"Подтвердить", callback_data=NumbersCallbackFactoryConfirmOrder(id=orderdID)),
-    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID)),
+    builder.button(text=f"Отменить", callback_data=NumbersCallbackFactoryCancelOrder(id=orderdID)),
+    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID))
     builder.adjust(1)
 
     return builder.as_markup()
@@ -135,7 +147,17 @@ async def confirm_order_kb(orderdID):
 async def setOrderAsPaid_kb(orderdID):
     builder = InlineKeyboardBuilder()
     builder.button(text=f"Отметить как оплаченный", callback_data=NumbersCallbackFactorySetOrderUsPaid(id=orderdID)),
-    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID)),
+    builder.button(text=f"Отменить", callback_data=NumbersCallbackFactoryCancelOrder(id=orderdID)),
+    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID))
+    builder.adjust(1)
+
+    return builder.as_markup()
+
+async def setOrderAsReadyToSend_kb(orderdID):
+    builder = InlineKeyboardBuilder()
+    builder.button(text=f"Отметить как готов к отгрузке", callback_data=NumbersCallbackFactorySetOrderAsReadyToSend(id=orderdID)),
+    builder.button(text=f"Отменить", callback_data=NumbersCallbackFactoryCancelOrder(id=orderdID)),
+    builder.button(text=f"Удалить", callback_data=NumbersCallbackFactoryDeleteOrder(id=orderdID))
     builder.adjust(1)
 
     return builder.as_markup()

@@ -1,6 +1,8 @@
 import json
 
 from aiogram import types, Dispatcher, F
+
+from data.database.function import getBalance
 from keyboards.user_kb import bonus_kb
 
 
@@ -12,12 +14,16 @@ async def conditions(callback: types.CallbackQuery):
     with open("data/feed.json", "r", encoding='utf-8') as f:
         data = json.load(f)
     await callback.message.answer(f"{data['bonus_prog']['condition']}")
-    await callback.message.answer(f"Бонусная программа", reply_markup=bonus_kb())
+
+    balance = await getBalance(callback.from_user.id)
+    await callback.message.edit_text(f"Бонусная программа\nВаш бонусный баланс = {balance[0]}", reply_markup=bonus_kb())
 
 async def participate(callback: types.CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(f"Теперь выучавствуете")
-    await callback.message.answer(f"Бонусная программа", reply_markup=bonus_kb())
+
+    balance = await getBalance(callback.from_user.id)
+    await callback.message.edit_text(f"Бонусная программа\nВаш бонусный баланс = {balance[0]}", reply_markup=bonus_kb())
 
 
 
